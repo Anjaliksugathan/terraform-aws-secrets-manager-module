@@ -3,4 +3,4 @@
 *.tfstate.*
 terraform.tfvars
 *.auto.tfvars
-.crash.logs
+.crash.log

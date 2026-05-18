@@ -1,3 +1,4 @@
+Top section
 # Terraform AWS Secrets Manager Module
 
 Reusable Terraform module for securely managing AWS Secrets Manager secrets
@@ -6,15 +7,14 @@ on a shared AWS platform.
 ## Features
 
 - Secure defaults
-- AWS Secrets Manager integration
-- Optional secret rotation support
+- Runtime secret injection
 - KMS encryption support
-- Tagging support
-- Validation rules
+- Optional rotation support
+- Replica region support
+- Resource policy support
 - CI-ready structure
-
----
-
+- Terraform validation support
+Usage section
 ## Usage
 
 ```hcl
@@ -24,11 +24,13 @@ module "app_secret" {
   name = "shared/platform/app/db"
 
   secret_values = var.secret_values
+
+  replica_regions = [
+    "eu-central-1"
+  ]
 }
 ```
-
----
-
+Secure injection section (VERY IMPORTANT)
 ## Secure Secret Injection
 
 Secrets should NEVER be committed to Git.
@@ -44,61 +46,58 @@ export TF_VAR_secret_values='{
 }'
 ```
 
-### CI/CD Secret Injection
+### CI/CD Injection
 
 Inject secrets securely through:
 - GitHub Actions Secrets
 - GitLab CI Variables
 - Vault integrations
 - AWS SSM Parameter Store
-
----
-
+Security section (CRITICAL)
 ## Security Considerations
 
 Although secrets are stored in AWS Secrets Manager,
-Terraform state may still contain sensitive values.
+Terraform state may still contain secret values.
 
 Recommended mitigations:
-- Use encrypted remote state backends
-- Restrict Terraform state access
-- Enable state locking
-- Avoid local state storage
+- encrypted remote state backend
+- restricted IAM access
+- state locking
+- dedicated Terraform execution roles
+- SSE-KMS encrypted S3 backend
 
----
+Secrets must never be committed to:
+- Git
+- tfvars files
+- CI logs
 
+This is VERY important for a security company. Community discussions repeatedly warn that Terraform state can still expose secrets.
+
+Rotation section
 ## Rotation Support
 
-This module supports optional AWS Secrets Manager rotation.
+The module supports optional AWS Secrets Manager rotation.
 
 Typical production setup:
 - Lambda rotation function
 - IAM permissions
-- Rotation schedule
+- Rotation schedules
 - Application credential refresh workflow
 
-Example:
+Rotation is intentionally optional to avoid over-opinionated defaults.
+Design decisions section (VERY SENIOR)
+## Design Decisions
 
-```hcl
-enable_rotation   = true
-rotation_days     = 30
-rotation_lambda_arn = aws_lambda_function.rotation.arn
-```
-
----
-
-## Assumptions
-
-- Shared AWS platform with centralized IAM/KMS controls
-- Terraform executed from CI/CD or secure developer environments
-- Remote state backend configured securely
-
----
-
+- Runtime secret injection instead of Git-managed secrets
+- Generic map(string) interface for flexibility
+- Optional rotation support
+- Replica region support for DR scenarios
+- ignore_changes used to prevent accidental secret overwrites
+TODO section
 ## TODO
 
-- Add resource-based policies
-- Add cross-region replication
-- Add opinionated rotation submodule
-- Add tfsec/checkov integration
-- Add automated tests
+- Add automatic secret generation
+- Add opinionated Lambda rotation submodule
+- Add Terratest coverage
+- Add cross-account access templates
+- Add tfsec/checkov enforcement

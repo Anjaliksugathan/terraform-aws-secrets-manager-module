@@ -15,7 +15,7 @@ variable "description" {
 }
 
 variable "kms_key_id" {
-  description = "Optional KMS key for secret encryption"
+  description = "Optional KMS key ID or ARN"
   type        = string
   default     = null
 }
@@ -38,13 +38,13 @@ variable "recovery_window_in_days" {
 }
 
 variable "enable_rotation" {
-  description = "Enable automatic rotation"
+  description = "Enable secret rotation"
   type        = bool
   default     = false
 }
 
 variable "rotation_lambda_arn" {
-  description = "Lambda ARN used for rotation"
+  description = "Lambda ARN for rotation"
   type        = string
   default     = null
 }
@@ -55,8 +55,20 @@ variable "rotation_days" {
   default     = 30
 }
 
+variable "replica_regions" {
+  description = "List of replica AWS regions"
+  type        = list(string)
+  default     = []
+}
+
+variable "resource_policy" {
+  description = "Optional resource policy JSON"
+  type        = string
+  default     = null
+}
+
 variable "tags" {
-  description = "Resource tags"
+  description = "Tags applied to resources"
   type        = map(string)
   default     = {}
 }

@@ -10,12 +10,14 @@ module "app_secret" {
 
   secret_values = var.secret_values
 
-  enable_rotation   = false
+  replica_regions = [
+    "eu-central-1"
+  ]
+
   recovery_window_in_days = 7
 
   tags = {
     Environment = "prod"
     Team        = "platform"
-    ManagedBy   = "terraform"
   }
 }

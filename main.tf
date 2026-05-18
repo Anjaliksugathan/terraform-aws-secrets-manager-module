@@ -4,6 +4,14 @@ resource "aws_secretsmanager_secret" "this" {
   kms_key_id              = var.kms_key_id
   recovery_window_in_days = var.recovery_window_in_days
 
+  dynamic "replica" {
+    for_each = var.replica_regions
+
+    content {
+      region = replica.value
+    }
+  }
+
   tags = local.common_tags
 }
 
@@ -18,6 +26,13 @@ resource "aws_secretsmanager_secret_version" "this" {
   }
 }
 
+resource "aws_secretsmanager_secret_policy" "this" {
+  count = var.resource_policy != null ? 1 : 0
+
+  secret_arn = aws_secretsmanager_secret.this.arn
+  policy     = var.resource_policy
+}
+
 resource "aws_secretsmanager_secret_rotation" "this" {
   count = var.enable_rotation ? 1 : 0
 
@@ -30,7 +45,7 @@ resource "aws_secretsmanager_secret_rotation" "this" {
 }
 
 # TODO:
-# - Add resource-based policies
-# - Add cross-region replication
-# - Add opinionated rotation submodule
-# - Add secret validation rules
+# - Add opinionated rotation Lambda submodule
+# - Add automatic secret generation
+# - Add cross-account access templates
+# - Add Terratest coverage
