@@ -1,14 +1,21 @@
-module "secret" {
+provider "aws" {
+  region = "eu-west-1"
+}
+
+module "app_secret" {
   source = "../../"
 
-  name = "prod/app/db"
+  name        = "shared/platform/app/db"
+  description = "Application database credentials"
 
-  secret_values = {
-    username = "appuser"
-    password = "supersecret"
-  }
+  secret_values = var.secret_values
+
+  enable_rotation   = false
+  recovery_window_in_days = 7
 
   tags = {
     Environment = "prod"
+    Team        = "platform"
+    ManagedBy   = "terraform"
   }
 }

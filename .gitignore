@@ -1,4 +1,6 @@
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 terraform.tfvars
+*.auto.tfvars
+.crash.logs
